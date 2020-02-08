@@ -1,6 +1,37 @@
 version: "3"
 services:
   app:
-    # your code goes here ...
+    # leverage flask environment variables
+    environment:
+      # set flask environment to development to
+      # enable hotloading of code changes
+      - FLASK_ENV=development
+      - FLASK_APP=server
+      # default port is 5000, lets use 8000 for
+      # configuration simplification
+      - FLASK_RUN_PORT=8000
+      - FLASK_RUN_HOST=0.0.0.0
+    container_name: app
+    image: harry/app
+    # will make use of the FLASK_RUN_* variables
+    command: flask run
+    expose:
+      - 8000
+    # Since we configured flask for development
+    # to support hotloading lets make sure changes
+    # are reflected
+    volumes:
+      - ./app/src/:/home/app/
   nginx:
-    # your code goes here ...
+    container_name: nginx_upstream_proxy
+    # nginx container is well setup to 
+    # support our requirements
+    image: nginx
+    # expose and bind container ports
+    ports:
+      - 80:80
+      - 443:443
+    # make our repo files availabel to the container
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/files/:/etc/nginx/
