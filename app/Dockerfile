@@ -14,7 +14,7 @@ WORKDIR /home/app
 COPY src/requirements.txt requirements.txt
 
 # update pip and install requirements
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt && pip install gevent
 
 # move over the rest of our source code.
 COPY src .
@@ -29,4 +29,4 @@ USER app
 EXPOSE 8000
 
 # Define a sane state if we run the container without other configuration
-CMD gunicorn --bind :8000 --max-requests 10000 --timeout 5 --access-logfile - --error-logfile - --log-level info server:app
+CMD gunicorn --bind :8000 --worker-class gevent --timeout 5 --access-logfile - --error-logfile - --log-level info server:app
