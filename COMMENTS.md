@@ -2,6 +2,8 @@
 ------------
 
 ## Design Decisions
+While I believe nginx is a perfectly fine reverse proxy for one off configurations, generally speaking I would use things like caddy and envoy that are created with modern design patterns in mind, along with other useful integrations like let's encrypt by default. We are also leveraging gevent as the worker system, this should allow for increased concurrency by switching from single threaded workers, to asynchronous execution. Because the overhead of our microservice is so low, this should scale reasonably well.
+
 
 #### Using nginx provided nginx image
 The `nginx:latest` image is setup well to support our configuration, and so I have chosen it as the image to use. We provide quite a bit of configuration inside of `nginx/nginx.conf` so mounting `nginx/nginx.conf` to `/etc/nginx/nginx.conf`, and our ssl `nginx/files/` to `/etc/nginx/ssl/` allows us to achive the expected behavior while maximizing simplicity in our setup.
