@@ -2,7 +2,7 @@
 ------------
 
 ## Design Decisions
-While I believe nginx is a perfectly fine reverse proxy for one off configurations, generally speaking I would use things like caddy and envoy that are created with modern design patterns in mind, along with other useful integrations like let's encrypt by default. We are also leveraging gevent as the worker system, this should allow for increased concurrency by switching from single threaded workers, to asynchronous execution. Because the overhead of our microservice is so low, this should scale reasonably well.
+While I believe nginx is a perfectly fine reverse proxy for one off configurations, generally speaking I would use things like caddy and envoy that are created with modern design patterns in mind, along with other useful integrations like let's encrypt by default. We are also leveraging gevent as the worker system, this should allow for increased concurrency by switching from single threaded workers, to asynchronous execution. Because the overhead of our microservice is so low, this should scale reasonably well. However if the service becomes I/O bound waiting for services in the future, this setting will likely cause problems.
 
 
 #### Using nginx provided nginx image
@@ -12,6 +12,8 @@ Note: the current `nginx.conf` file relies on the upstream service `app` being e
 
 #### `python:buster` vs `python:alpine`
 A large number of apps out there like to roll their images using alpines base, and this tends to be fine for applications built in compiled languages like GO where binaries have everything they need. In python we're presented with some unique challenges as the differences between glibc and musl cause issues with the precompiled PyPI binary wheel. This requires that source code be pulled so the appropriate version can be built increasing space used and build time
+
+This also will cause configuration complexity as widely used services such as postgresql will require recompiles, increasing our image size and build times.
 
 Using buster we have a download size of approx 60mb, and a final size on disk after building of 208mb
 
